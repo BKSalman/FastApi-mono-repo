@@ -1,0 +1,181 @@
+version: "3.10"
+
+x-common-envs: &common-envs
+
+  DB_HOST: "db"
+  DB_USER: "postgres"
+  DB_PASSWORD: "password"
+  DB_PORT: 5432
+
+  REDIS_HOST: redis
+  REDIS_PORT: 6379
+
+  LOGGING_LEVEL: DEBUG
+
+  SMTP_HOST: "mailhog"
+  SMTP_PORT: 1025
+  SMTP_SENDER: "local-sender"
+
+x-users-envs: &users-envs
+  <<: *common-envs
+  APP_NAME: "users"
+  DB_NAME: "users_db"
+  CELERY_BROKER_URL: redis://redis:6379/1
+  REDIS_DB: 0
+
+
+x-users-build-volumes: &users-build-volumes
+  build:
+    context: .
+    dockerfile: "./Dockerfile"
+    args:
+      APP_NAME: users
+  volumes:
+    - ./commons/:/app/commons
+    - ./users/:/app/users
+    - ./conftest.py:/app/conftest.py
+    - ./.github/linters/tox.ini:/app/tox.ini
+  environment:
+    <<: *users-envs
+
+x-resorts-envs: &resorts-envs
+  <<: *common-envs
+  APP_NAME: "resorts"
+  DB_NAME: "resorts_db"
+  CELERY_BROKER_URL: redis://redis:6379/3
+  REDIS_DB: 1
+
+
+x-resorts-build-volumes: &resorts-build-volumes
+  build:
+    context: .
+    dockerfile: "./Dockerfile"
+    args:
+      APP_NAME: resorts
+  volumes:
+    - ./commons/:/app/commons
+    - ./resorts/:/app/resorts
+    - ./conftest.py:/app/conftest.py
+    - ./.github/linters/tox.ini:/app/tox.ini
+  environment:
+    <<: *resorts-envs
+
+services:
+  # < =========================================================== >
+  # < ==================== COMMON SERVICES ====================== >
+  # < =========================================================== >
+  db:
+    ports:
+      - "5440:5432"
+    image: postgres
+    volumes:
+      - datebase:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+
+  redis:
+    image: redis
+    ports:
+      - "6380:6379"
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui. Visit http://localhost:8025/ to check emails
+    restart: unless-stopped
+    logging:
+      driver: none
+
+  # < =========================================================== >
+  # < ===================== USERS SERVICES ======================= >
+  # < =========================================================== >
+
+  users-api:
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+      - users-celery
+      - users-celery-beat
+    ports:
+      - "3001:80"
+    command: /start-reload.sh
+    <<: *users-build-volumes
+    environment:
+      <<: *users-envs
+
+  users-pytest:
+    depends_on:
+      - db
+      - redis
+      - mailhog
+    command: pytest
+    <<: *users-build-volumes
+    environment:
+      <<: *users-envs
+      ENVIRONMENT: "testing"
+      DB_NAME: "users_testing"
+
+  users-celery:
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - db
+      - mailhog
+    command: watchmedo auto-restart -p="*.py" -R celery -- -A users.celery_worker.worker worker --loglevel=debug
+    <<: *users-build-volumes
+  
+  users-celery-beat:
+    restart: unless-stopped
+    depends_on:
+      - redis
+    command: "celery -A users.celery_worker.beat beat --loglevel=debug"
+    <<: *users-build-volumes
+
+  # < =========================================================== >
+  # < ===================== RESORTS SERVICES ======================= >
+  # < =========================================================== >
+
+  resorts-api:
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+      - resorts-celery
+      - resorts-celery-beat
+    ports:
+      - "3002:80"
+    command: /start-reload.sh
+    <<: *resorts-build-volumes
+
+  resorts-pytest:
+    depends_on:
+      - db
+      - redis
+      - mailhog
+    command: pytest
+    <<: *resorts-build-volumes
+    environment:
+      <<: *resorts-envs
+      ENVIRONMENT: "testing"
+      DB_NAME: "resorts_testing"
+
+  resorts-celery:
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - db
+      - mailhog
+    command: watchmedo auto-restart -p="*.py" -R celery -- -A resorts.celery_worker.worker worker --loglevel=debug
+    <<: *resorts-build-volumes
+
+  resorts-celery-beat:
+    restart: unless-stopped
+    depends_on:
+      - redis
+    command: "celery -A resorts.celery_worker.beat beat --loglevel=debug"
+    <<: *resorts-build-volumes
+
+volumes:
+  datebase:
