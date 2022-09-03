@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("..")
 from logging.config import fileConfig
 
@@ -6,7 +7,7 @@ from alembic import context
 from users.app.config import config as fastapi_config
 from commons.db import Base
 from sqlalchemy import engine_from_config, pool
-
+from users.app.api.users.models import User
 
 
 # this is the Alembic Config object, which provides

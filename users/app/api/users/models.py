@@ -12,4 +12,10 @@ class User(Base):
     created = sa.Column(sa.DateTime, default=datetime.now, nullable=False)
     updated = sa.Column(sa.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
-    name = sa.Column(sa.String, nullable=True)
+    first_name = sa.Column(sa.String, nullable=True)
+    last_name = sa.Column(sa.String, nullable=True)
+    username = sa.Column(sa.String, nullable=False)
+    email = sa.Column(sa.String, nullable=True)
+    nationality = sa.Column(sa.String, nullable=True)
+    bio = sa.Column(sa.String, nullable=True)
+    password = sa.Column(sa.String, nullable=False)

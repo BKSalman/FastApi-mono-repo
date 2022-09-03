@@ -9,6 +9,10 @@ from commons.config import (
 
 class BaseConfig(CommonBaseConfig):
     APP_NAME: str = "users"
+    ALGORITHM: str
+    AUTH_JWT_KEY: str
+    AUTH_TOKEN_EXPIRE_IN: int
+    AUTH_SALT: str
 
 
 class ProductionConfig(CommonProductionConfig, BaseConfig):  # type: ignore

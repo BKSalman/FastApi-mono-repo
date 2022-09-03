@@ -8,7 +8,7 @@ x-common-envs: &common-envs
   DB_PORT: 5432
 
   REDIS_HOST: redis
-  REDIS_PORT: 6379
+  REDIS_PORT: 6381
 
   LOGGING_LEVEL: DEBUG
 
@@ -19,8 +19,12 @@ x-common-envs: &common-envs
 x-users-envs: &users-envs
   <<: *common-envs
   APP_NAME: "users"
+  ALGORITHM: "HS256"
+  AUTH_JWT_KEY: "853a2425299cbddbcf47ad387c150601888e4e3a64811044e30b6b73ee79276a"
+  AUTH_SALT: "74d50c79-8252-4c82-a3e1-627fce3b0f1b"
+  AUTH_TOKEN_EXPIRE_IN: 600
   DB_NAME: "users_db"
-  CELERY_BROKER_URL: redis://redis:6379/1
+  CELERY_BROKER_URL: redis://redis:6381/1
   REDIS_DB: 0
 
 
@@ -42,7 +46,7 @@ x-resorts-envs: &resorts-envs
   <<: *common-envs
   APP_NAME: "resorts"
   DB_NAME: "resorts_db"
-  CELERY_BROKER_URL: redis://redis:6379/3
+  CELERY_BROKER_URL: redis://redis:6381/3
   REDIS_DB: 1
 
 
@@ -69,14 +73,14 @@ services:
       - "5440:5432"
     image: postgres
     volumes:
-      - datebase:/var/lib/postgresql/data
+      - datebase1:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password
 
   redis:
     image: redis
     ports:
-      - "6380:6379"
+      - "6380:6381"
 
   mailhog:
     image: mailhog/mailhog
@@ -178,4 +182,4 @@ services:
     <<: *resorts-build-volumes
 
 volumes:
-  datebase:
+  datebase1:

@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("..")
 from logging.config import fileConfig
 
@@ -6,7 +7,7 @@ from alembic import context
 from resorts.app.config import config as fastapi_config
 from commons.db import Base
 from sqlalchemy import engine_from_config, pool
-
+from resorts.app.api.resorts.models import Resort
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

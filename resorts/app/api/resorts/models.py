@@ -6,7 +6,7 @@ from commons.utils.generate_random_id_uuid import generate_random_uuid
 
 
 class Resort(Base):
-    __tablename__ = "resort"
+    __tablename__ = "resorts"
 
     id = sa.Column(sa.String, primary_key=True, default=generate_random_uuid)
     created = sa.Column(sa.DateTime, default=datetime.now, nullable=False)
