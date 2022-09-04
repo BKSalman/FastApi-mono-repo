@@ -1,5 +1,5 @@
 import json
-from users.app.api.users.schemas import UserResponse
+from commons.schemas import UserResponse
 from users.app.common.db import db
 from users.app.common.exceptions import InvalidCredentialsException, NoTokenException
 from users.app.config import config

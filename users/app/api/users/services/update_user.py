@@ -1,5 +1,6 @@
 from users.app.api.users.models import User
-from users.app.api.users.schemas import UserResponse, UserUpdateRequest
+from users.app.api.users.schemas import UserUpdateRequest
+from commons.schemas import UserResponse
 from users.app.common.dependencies import db_session
 from sqlalchemy.orm import Session
 

@@ -6,11 +6,11 @@ from sqlalchemy.orm import Session
 
 from users.app.common.exceptions import InvalidCredentialsException
 
+from commons.schemas import UserResponse, UserToken
+
 from .schemas import (
-    TokenSchema,
     UserListResponse,
     UserRegisterRequest,
-    UserResponse,
     UserLoginRequest,
     UserUpdateRequest,
 )
@@ -41,7 +41,7 @@ def create_user(
 
 @users_router.post(
     "/login",
-    response_model=TokenSchema,
+    response_model=UserToken,
 )
 def user_login(
     request_user: UserLoginRequest,

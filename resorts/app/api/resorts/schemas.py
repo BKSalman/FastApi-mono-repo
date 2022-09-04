@@ -9,5 +9,10 @@ class ResortResponse(BaseModel):
         orm_mode = True
 
 
-class ResortRequest(BaseModel):
+class ResortCreateRequest(BaseModel):
     name: str
+
+
+class UserRequest(BaseModel):
+    username: str
+    password: str

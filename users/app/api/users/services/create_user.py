@@ -2,7 +2,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from users.app.api.users.models import User
 from users.app.api.users.exceptions import UserExistsException
-from users.app.api.users.schemas import UserRegisterRequest, UserResponse
+from commons.schemas import UserResponse
+from users.app.api.users.schemas import UserRegisterRequest
 from users.app.common.utils import get_hashed_password
 
 
