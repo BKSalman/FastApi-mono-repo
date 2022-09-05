@@ -8,6 +8,6 @@ def list_resorts_(
     session: Session,
     current_user: UserResponse,
 ) -> list:
-    stmt = select(Resort).where(Resort.user_id == current_user.id).order_by(Resort.created.desc())
+    stmt = select(Resort).where(Resort.user_id == current_user["id"]).order_by(Resort.created.desc())
     resorts: list[Resort] = session.execute(stmt).scalars().all()
     return resorts

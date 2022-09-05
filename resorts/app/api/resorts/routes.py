@@ -16,7 +16,7 @@ resorts_router = APIRouter(prefix="/resorts", tags=["resorts"])
 
 @resorts_router.get(
     path="",
-    response_model=list[ResortResponse],
+    # response_model=list[ResortResponse],
 )
 def list_resorts(
     session: Session = db_session,
